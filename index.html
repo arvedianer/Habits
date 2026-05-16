@@ -1,0 +1,1116 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#050505">
+<title>ARVED — Protocol</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #050505; --surface: #0c0c0e; --surface2: #141417; --surface3: #1c1c21;
+  --border: #222228; --border2: #2a2a32; --border3: #33333d;
+  --text: #f0f0eb; --text2: #a8a89e; --text3: #6e6e64; --muted: #4a4a44;
+  --accent: #c8f55a; --accent2: #f5c84a; --accent-dim: rgba(200,245,90,0.08); --danger: #f87171;
+  --c-mind: #e8d5b5; --c-mind-glow: rgba(232,213,181,0.12);
+  --c-body: #7dd3c0; --c-body-glow: rgba(125,211,192,0.12);
+  --c-look: #f5a8a8; --c-look-glow: rgba(245,168,168,0.12);
+  --c-move: #a5b4fc; --c-move-glow: rgba(165,180,252,0.12);
+  --c-fuel: #fcd34d; --c-fuel-glow: rgba(252,211,77,0.12);
+  --c-create:#c4b5fd; --c-create-glow:rgba(196,181,253,0.12);
+  --c-social:#fca5a5; --c-social-glow:rgba(252,165,165,0.12);
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html { scroll-behavior:smooth; }
+body { background: var(--bg); color: var(--text); font-family: 'DM Sans', 'Inter', sans-serif; min-height:100vh; overflow-x:hidden; -webkit-font-smoothing: antialiased; }
+body::before { content:''; position:fixed; inset:0; z-index:9999; pointer-events:none; opacity:0.03; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+.app { max-width:430px; margin:0 auto; position:relative; z-index:1; padding-bottom:100px; }
+
+/* HEADER */
+.header { position:sticky; top:0; z-index:200; background: linear-gradient(180deg, rgba(5,5,5,0.98) 60%, rgba(5,5,5,0.6)); backdrop-filter: blur(24px) saturate(140%); -webkit-backdrop-filter: blur(24px) saturate(140%); border-bottom: 1px solid var(--border); padding: 24px 22px 0; }
+.header-row { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:18px; }
+.logo { font-family:'Bebas Neue', sans-serif; font-size: 40px; letter-spacing: 4px; color: var(--text); line-height:0.9; position:relative; }
+.logo::after { content:''; position:absolute; bottom:-2px; left:0; width:40px; height:2px; background: linear-gradient(90deg, var(--accent), transparent); }
+.logo-sub { font-family:'DM Mono', monospace; font-size: 9px; letter-spacing: 3px; color: var(--muted); text-transform:uppercase; margin-top: 6px; }
+.header-right { text-align:right; }
+.date-str { font-family:'DM Mono', monospace; font-size: 10px; color: var(--text3); letter-spacing: 1.5px; text-transform: uppercase; }
+.streak-pill { display:inline-flex; align-items:center; gap:6px; background: linear-gradient(135deg, rgba(200,245,90,0.08), rgba(245,200,74,0.06)); border: 1px solid rgba(200,245,90,0.18); border-radius: 20px; padding: 5px 12px; margin-top: 8px; font-family:'DM Mono', monospace; font-size: 11px; color: var(--accent); font-weight: 500; letter-spacing: 0.5px; box-shadow: 0 2px 12px rgba(200,245,90,0.06); }
+
+/* HERO */
+.hero { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 20px 22px 16px; }
+.hero-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px 16px; position: relative; overflow: hidden; transition: transform 0.3s ease, border-color 0.3s ease; }
+.hero-card:active { transform: scale(0.97); }
+.hero-card::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background: linear-gradient(90deg, transparent, var(--border3), transparent); }
+.hero-label { font-family:'DM Mono', monospace; font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+.hero-ring-wrap { position: relative; width: 48px; height: 48px; margin-bottom: 8px; }
+.hero-ring-wrap svg { transform: rotate(-90deg); }
+.hero-ring-track { fill: none; stroke: var(--surface3); stroke-width: 3; }
+.hero-ring-fill { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1); filter: drop-shadow(0 0 4px rgba(200,245,90,0.3)); }
+.hero-value { font-family:'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 1px; line-height: 1; background: linear-gradient(180deg, var(--text), var(--text2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero-sub { font-family:'DM Mono', monospace; font-size: 10px; color: var(--text3); margin-top: 6px; letter-spacing: 0.5px; }
+
+/* NAV */
+.nav { display:flex; overflow-x:auto; scrollbar-width:none; border-top: 1px solid var(--border); margin: 0 -22px; padding: 0 22px; gap: 6px; }
+.nav::-webkit-scrollbar { display:none; }
+.nav-tab { font-family:'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 14px 16px; color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.25s ease; user-select: none; position: relative; }
+.nav-tab:hover { color: var(--text2); }
+.nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.nav-tab.active::after { content:''; position:absolute; bottom:-2px; left:50%; transform:translateX(-50%); width: 20px; height: 2px; background: var(--accent); border-radius: 2px; box-shadow: 0 0 8px var(--accent); }
+
+/* SECTIONS */
+.section { display: none; animation: sectionEnter 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
+.section.active { display: block; }
+@keyframes sectionEnter { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+/* FOCUS CARD */
+.focus-wrap { padding: 4px 22px 20px; }
+.focus-card { background: linear-gradient(135deg, var(--surface), var(--surface2)); border: 1px solid var(--border2); border-radius: 20px; padding: 22px 20px; position: relative; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.03); transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+.focus-card.active-now { border-color: rgba(200,245,90,0.3); box-shadow: 0 0 0 1px rgba(200,245,90,0.1), 0 8px 40px rgba(200,245,90,0.08), inset 0 1px 0 rgba(255,255,255,0.04); animation: focusPulse 4s ease-in-out infinite; }
+@keyframes focusPulse { 0%, 100% { box-shadow: 0 0 0 1px rgba(200,245,90,0.08), 0 8px 40px rgba(200,245,90,0.06); } 50% { box-shadow: 0 0 0 2px rgba(200,245,90,0.15), 0 8px 48px rgba(200,245,90,0.12); } }
+.focus-label { font-family:'DM Mono', monospace; font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.focus-label .dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 8px var(--accent); animation: dotPulse 2s ease-in-out infinite; }
+@keyframes dotPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.8); } }
+.focus-title { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; line-height: 1.2; }
+.focus-meta { font-family:'DM Mono', monospace; font-size: 11px; color: var(--text3); display: flex; gap: 16px; flex-wrap: wrap; }
+.focus-action { margin-top: 16px; display: flex; gap: 10px; }
+.btn { flex: 1; background: var(--accent); color: #0a0a0a; border: none; border-radius: 14px; padding: 14px 20px; font-family:'DM Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; letter-spacing: 0.2px; }
+.btn:active { transform: scale(0.96); opacity: 0.9; }
+.btn-ghost { background: transparent; border: 1px solid var(--border3); color: var(--text2); font-weight: 600; }
+.btn-ghost:hover { border-color: var(--text3); color: var(--text); }
+
+/* ROUTINE GROUPS */
+.routine-group { padding: 16px 22px 8px; }
+.group-label { font-family:'DM Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--text3); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+.group-label::after { content:''; flex:1; height:1px; background: linear-gradient(90deg, var(--border), transparent); }
+
+/* HABIT CARDS */
+.habit-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 10px; overflow: hidden; cursor: pointer; transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1); position: relative; }
+.habit-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background: transparent; border-radius: 14px 0 0 14px; transition: background 0.3s ease; }
+.habit-card:hover { border-color: var(--border2); transform: translateX(2px); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+.habit-card.done { opacity: 0.45; border-color: rgba(200,245,90,0.15); }
+.habit-card.done .habit-name { text-decoration: line-through; color: var(--text3); }
+.habit-card.done .habit-time { color: var(--muted); }
+.habit-card.current { border-color: rgba(200,245,90,0.25); background: linear-gradient(90deg, rgba(200,245,90,0.03), var(--surface)); box-shadow: 0 0 20px rgba(200,245,90,0.05); }
+.habit-card.current::before { background: var(--accent); }
+.habit-card.tag-mind::before { background: var(--c-mind); }
+.habit-card.tag-body::before { background: var(--c-body); }
+.habit-card.tag-look::before { background: var(--c-look); }
+.habit-card.tag-move::before { background: var(--c-move); }
+.habit-card.tag-fuel::before { background: var(--c-fuel); }
+.habit-card.tag-create::before { background: var(--c-create); }
+.habit-card.tag-social::before { background: var(--c-social); }
+.habit-main { display: flex; align-items: center; gap: 14px; padding: 16px 18px; position: relative; z-index: 1; }
+.check-ring { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border2); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; }
+.check-ring svg { opacity: 0; transform: scale(0.3) rotate(-20deg); transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.habit-card.done .check-ring { background: var(--accent); border-color: var(--accent); transform: scale(1.05); box-shadow: 0 0 12px rgba(200,245,90,0.3); }
+.habit-card.done .check-ring svg { opacity: 1; transform: scale(1) rotate(0deg); }
+.habit-body { flex: 1; min-width: 0; }
+.habit-time { font-family:'DM Mono', monospace; font-size: 10px; color: var(--text3); letter-spacing: 1px; margin-bottom: 3px; transition: color 0.3s; }
+.habit-name { font-size: 14.5px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.01em; transition: color 0.3s; }
+.habit-tag { font-size: 9px; padding: 3px 8px; border-radius: 6px; font-family:'DM Mono', monospace; letter-spacing: 0.5px; flex-shrink: 0; font-weight: 500; border: 1px solid transparent; }
+.tag-mind   { background: var(--c-mind-glow);   color: var(--c-mind);   border-color: rgba(232,213,181,0.15); }
+.tag-body   { background: var(--c-body-glow);   color: var(--c-body);   border-color: rgba(125,211,192,0.15); }
+.tag-look   { background: var(--c-look-glow);   color: var(--c-look);   border-color: rgba(245,168,168,0.15); }
+.tag-move   { background: var(--c-move-glow);   color: var(--c-move);   border-color: rgba(165,180,252,0.15); }
+.tag-fuel   { background: var(--c-fuel-glow);   color: var(--c-fuel);   border-color: rgba(252,211,77,0.15); }
+.tag-create { background: var(--c-create-glow); color: var(--c-create); border-color: rgba(196,181,253,0.15); }
+.tag-social { background: var(--c-social-glow); color: var(--c-social); border-color: rgba(252,165,165,0.15); }
+
+/* EXPAND */
+.habit-expand { border-top: 1px solid var(--border); padding: 14px 18px 16px; background: linear-gradient(180deg, rgba(20,20,23,0.5), var(--surface2)); display: none; animation: expandIn 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+.habit-card.open .habit-expand { display: block; }
+@keyframes expandIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+.expand-why { font-size: 12.5px; color: var(--text2); line-height: 1.65; margin-bottom: 10px; font-style: italic; padding-left: 14px; border-left: 2px solid var(--border2); }
+.expand-tip { font-size: 12px; color: var(--text3); display: flex; gap: 8px; align-items: flex-start; }
+.expand-tip::before { content: '\u2192'; color: var(--accent); font-family:'DM Mono', monospace; font-size: 11px; flex-shrink: 0; margin-top: 1px; }
+
+/* ADD HABIT */
+.add-bar { position: fixed; bottom: 76px; left: 50%; transform: translateX(-50%); width: 430px; max-width: 100vw; background: linear-gradient(180deg, rgba(5,5,5,0.9), rgba(5,5,5,0.98)); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--border); padding: 12px 22px 16px; display: flex; gap: 10px; z-index: 250; }
+.add-input { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px 16px; color: var(--text); font-size: 15px; outline: none; transition: border-color 0.2s; }
+.add-input:focus { border-color: var(--accent); }
+.add-input::placeholder { color: var(--muted); }
+.btn-add { background: var(--surface2); border: 1px solid var(--border); color: var(--accent); border-radius: 14px; width: 48px; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.btn-add:active { transform: scale(0.9); background: var(--accent); color: var(--bg); }
+
+/* MENTOR */
+.mentor-section { padding: 20px 22px 0; }
+.mentor-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; padding: 20px; background: linear-gradient(135deg, rgba(200,245,90,0.04), rgba(245,200,74,0.02)); border: 1px solid rgba(200,245,90,0.12); border-radius: 18px; position: relative; overflow: hidden; }
+.mentor-header::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background: linear-gradient(90deg, var(--accent), transparent); }
+.mentor-avatar { width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; box-shadow: 0 4px 20px rgba(200,245,90,0.2); }
+.mentor-name { font-family:'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; color: var(--accent); line-height: 1; }
+.mentor-role { font-family:'DM Mono', monospace; font-size: 10px; color: var(--text3); letter-spacing: 2px; margin-top: 4px; text-transform: uppercase; }
+.chat-window { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; height: 420px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+.chat-messages { flex: 1; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 14px; scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
+.msg { max-width: 88%; animation: msgSlide 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+@keyframes msgSlide { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.msg-mentor { align-self: flex-start; }
+.msg-user { align-self: flex-end; }
+.msg-bubble { padding: 12px 16px; border-radius: 16px; font-size: 13.5px; line-height: 1.55; font-weight: 400; }
+.msg-mentor .msg-bubble { background: var(--surface2); border: 1px solid var(--border2); border-bottom-left-radius: 4px; color: var(--text); }
+.msg-user .msg-bubble { background: linear-gradient(135deg, rgba(200,245,90,0.1), rgba(245,200,74,0.06)); border: 1px solid rgba(200,245,90,0.15); border-bottom-right-radius: 4px; color: var(--text); }
+.msg-label { font-family:'DM Mono', monospace; font-size: 9px; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; }
+.msg-mentor .msg-label { color: var(--accent); }
+.chat-input-row { border-top: 1px solid var(--border); padding: 14px 16px; display: flex; gap: 10px; background: var(--surface); }
+.chat-input { flex: 1; background: var(--surface2); border: 1px solid var(--border2); border-radius: 14px; padding: 11px 14px; font-family:'DM Sans', sans-serif; font-size: 14px; color: var(--text); outline: none; transition: all 0.2s; }
+.chat-input:focus { border-color: rgba(200,245,90,0.3); background: var(--surface3); }
+.chat-input::placeholder { color: var(--muted); }
+.send-btn { background: var(--accent); border: none; border-radius: 14px; width: 42px; height: 42px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
+.send-btn:hover { transform: scale(1.05); box-shadow: 0 4px 16px rgba(200,245,90,0.25); }
+.send-btn:active { transform: scale(0.92); }
+.typing-indicator { display: none; align-self: flex-start; margin-left: 4px; }
+.typing-indicator.visible { display: flex; }
+.typing-bubble { background: var(--surface2); border: 1px solid var(--border2); border-radius: 16px; border-bottom-left-radius: 4px; padding: 12px 16px; display: flex; gap: 4px; align-items: center; }
+.typing-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text3); animation: typingBounce 1.4s infinite ease-in-out; }
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingBounce { 0%, 80%, 100% { transform: translateY(0); opacity: 0.3; } 40% { transform: translateY(-5px); opacity: 1; } }
+
+/* STATS */
+.stats-section { padding: 20px 22px 0; }
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; transition: transform 0.2s; }
+.stat-card:active { transform: scale(0.97); }
+.stat-val { font-family:'Bebas Neue', sans-serif; font-size: 40px; letter-spacing: 1px; line-height: 1; background: linear-gradient(180deg, var(--text), var(--text2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.stat-unit { font-family:'DM Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; }
+.stat-label { font-size: 12px; color: var(--text2); margin-top: 6px; font-weight: 500; }
+.week-grid { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 12px; }
+.week-label { font-family:'DM Mono', monospace; font-size: 10px; letter-spacing: 2.5px; color: var(--text3); text-transform: uppercase; margin-bottom: 14px; }
+.week-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+.week-day { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.week-day-label { font-family:'DM Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 1px; }
+.week-dot { width: 36px; height: 36px; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-family:'DM Mono', monospace; font-size: 10px; color: var(--muted); transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1); font-weight: 500; }
+.week-dot.great { background: var(--accent); border-color: var(--accent); color: #0a0a0a; font-weight: 700; box-shadow: 0 4px 16px rgba(200,245,90,0.25); }
+.week-dot.good { background: rgba(200,245,90,0.18); border-color: rgba(200,245,90,0.3); color: var(--accent); }
+.week-dot.ok { background: rgba(245,200,74,0.12); border-color: rgba(245,200,74,0.25); color: var(--accent2); }
+.week-dot.today { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 0 1px rgba(200,245,90,0.1); }
+.cat-bar-wrap { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+.cat-bar-row { display: flex; align-items: center; gap: 10px; }
+.cat-bar-label { font-size: 12px; color: var(--text2); width: 80px; flex-shrink: 0; font-weight: 500; }
+.cat-bar-track { flex: 1; height: 4px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
+.cat-bar-fill { height: 100%; border-radius: 99px; transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+.cat-bar-pct { font-family:'DM Mono', monospace; font-size: 10px; color: var(--text3); width: 32px; text-align: right; flex-shrink: 0; }
+
+/* EDIT */
+.edit-section { padding: 20px 22px 0; }
+.edit-note { font-size: 13px; color: var(--text3); line-height: 1.6; margin-bottom: 18px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; border-left: 2px solid var(--accent); }
+.edit-habit-row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 8px; transition: all 0.2s; }
+.edit-habit-row:hover { border-color: var(--border2); }
+.edit-habit-name { flex: 1; font-size: 13.5px; color: var(--text2); font-weight: 500; }
+.edit-habit-time { font-family:'DM Mono', monospace; font-size: 10px; color: var(--muted); flex-shrink: 0; }
+.toggle-btn { width: 44px; height: 24px; border-radius: 12px; background: var(--surface3); border: 1px solid var(--border2); cursor: pointer; position: relative; transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1); flex-shrink: 0; }
+.toggle-btn::after { content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: var(--muted); top: 2px; left: 2px; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+.toggle-btn.on { background: linear-gradient(135deg, var(--accent), var(--accent2)); border-color: transparent; }
+.toggle-btn.on::after { left: 22px; background: #000; box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+
+/* BOTTOM NAV */
+.bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 430px; max-width: 100vw; background: linear-gradient(180deg, rgba(5,5,5,0.95), rgba(5,5,5,0.98)); backdrop-filter: blur(24px) saturate(140%); -webkit-backdrop-filter: blur(24px) saturate(140%); border-top: 1px solid var(--border); display: grid; grid-template-columns: repeat(4, 1fr); padding: 10px 0 24px; z-index: 300; box-shadow: 0 -8px 32px rgba(0,0,0,0.4); }
+.bot-btn { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; padding: 8px 4px; transition: all 0.25s ease; user-select: none; position: relative; }
+.bot-btn:hover { opacity: 0.7; }
+.bot-btn.active { opacity: 1; }
+.bot-btn.active::before { content:''; position:absolute; top:-10px; left:50%; transform:translateX(-50%); width: 20px; height: 2px; background: var(--accent); border-radius: 2px; box-shadow: 0 0 8px var(--accent); }
+.bot-icon { font-size: 22px; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); filter: grayscale(0.3); }
+.bot-btn.active .bot-icon { transform: scale(1.15) translateY(-2px); filter: grayscale(0); }
+.bot-label { font-family:'DM Mono', monospace; font-size: 9px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; transition: color 0.2s; }
+.bot-btn.active .bot-label { color: var(--accent); font-weight: 500; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #0a0a0a; font-family:'DM Sans', sans-serif; font-size: 13px; font-weight: 700; padding: 12px 22px; border-radius: 16px; opacity: 0; transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1); white-space: nowrap; z-index: 500; pointer-events: none; box-shadow: 0 8px 32px rgba(200,245,90,0.25); letter-spacing: 0.3px; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* CELEBRATION */
+.celebration { position: fixed; inset: 0; z-index: 100; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); }
+.celebration.show { display: flex; }
+.celebration-box { background: var(--surface); border: 1px solid var(--accent); border-radius: 28px; padding: 40px 36px; text-align: center; max-width: 320px; width: 90%; animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes popIn { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: scale(1); } }
+.celebration-box h2 { font-size: 28px; margin-bottom: 8px; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.celebration-box p { color: var(--text2); font-size: 15px; }
+.confetti { position: fixed; width: 10px; height: 10px; background: var(--accent); border-radius: 50%; pointer-events: none; z-index: 101; }
+
+/* ALL DONE */
+.all-done { text-align: center; padding: 40px 20px; color: var(--text3); }
+.all-done-icon { font-size: 48px; margin-bottom: 12px; }
+.reset-btn { margin-top: 16px; background: none; border: 1px solid var(--border); color: var(--text3); padding: 10px 20px; border-radius: 12px; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+.reset-btn:hover { border-color: var(--danger); color: var(--danger); }
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+@media (max-width: 430px) { .app, .bottom-nav, .add-bar { max-width: 100vw; } }
+</style>
+</head>
+<body>
+<div class="celebration" id="celebration">
+  <div class="celebration-box">
+    <h2>🔥 PROTOCOL COMPLETE</h2>
+    <p>Du hast alle Habits für heute abgeschlossen. Streak erhöht!</p>
+  </div>
+</div>
+
+<div class="app">
+  <header class="header">
+    <div class="header-row">
+      <div>
+        <div class="logo">ARVED</div>
+        <div class="logo-sub">Daily Protocol</div>
+      </div>
+      <div class="header-right">
+        <div class="date-str" id="dateStr">—</div>
+        <div class="streak-pill">🔥 <span id="streakCount">0</span> Tage</div>
+      </div>
+    </div>
+    <div class="hero">
+      <div class="hero-card">
+        <div class="hero-label">Daily Score</div>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div class="hero-ring-wrap">
+            <svg width="48" height="48" viewBox="0 0 48 48">
+              <circle class="hero-ring-track" cx="24" cy="24" r="20"/>
+              <circle class="hero-ring-fill" id="heroRing" cx="24" cy="24" r="20" stroke-dasharray="125.6" stroke-dashoffset="125.6"/>
+            </svg>
+          </div>
+          <div>
+            <div class="hero-value" id="scoreValue">0%</div>
+            <div class="hero-sub" id="scoreSub">0 / 0</div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-label">Streak</div>
+        <div class="hero-value" id="streakValue">0</div>
+        <div class="hero-sub">Tage am Stück</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-tab active" onclick="switchTab('today')">Heute</div>
+      <div class="nav-tab" onclick="switchTab('mentor')">Mentor</div>
+      <div class="nav-tab" onclick="switchTab('stats')">Stats</div>
+      <div class="nav-tab" onclick="switchTab('edit')">Anpassen</div>
+    </nav>
+  </header>
+  <!-- TODAY -->
+  <div class="section active" id="today">
+    <div class="focus-wrap" id="focusWrap"></div>
+
+    <div class="routine-group">
+      <div class="group-label">🌅 Morning Prime — 07:00</div>
+      <div class="habit-card tag-mind" data-id="wake" data-start="07:00" data-end="07:05" onclick="handleCardClick(event,this)">
+        <div class="habit-main">
+          <div class="check-ring"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="habit-body"><div class="habit-time">07:00</div><div class="habit-name">Aufstehen — Kein Snooze, direkt Licht an</div></div>
+          <span class="habit-tag tag-mind">Mindset</span>
+        </div>
+        <div class="habit-expand">
+          <div class="expand-why">Die ersten 30 Minuten entscheiden über dein Dopamin-Niveau für den ganzen Tag. Wer sofort aufs Handy schaut, gibt sein Aufmerksamkeitssystem an Algorithmen ab.</div>
+          <div class="expand-tip">Handy face-down lassen. Erst nach dem Duschen wieder ansehen.</div>
+        </div>
+      </div>
+      <div class="habit-card tag-body" data-id="water" data-start="07:01" data-end="07:05" onclick="handleCardClick(event,this)">
+        <div class="habit-main">
+          <div class="check-ring"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="habit-body"><div class="habit-time">07:01</div><div class="habit-name">Hydration — 500ml Wasser trinken</div></div>
+          <span class="habit-tag tag-body">Body</span>
+        </div>
+        <div class="habit-expand">
+          <div class="expand-why">Nach 7–8 Stunden Schlaf ist dein Körper dehydriert. Wasser aktiviert Stoffwechsel, Konzentration und Verdauung — sofort, bevor irgendetwas anderes.</div>
+          <div class="expand-tip">Glas abends schon vorbereiten. Zimmerwarm trinken — besser für die Magenflora.</div>
+        </div>
+      </div>
+      <div class="habit-card tag-body" data-id="supps" data-start="07:03" data-end="07:08" onclick="handleCardClick(event,this)">
+        <div class="habit-main">
+          <div class="check-ring"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="habit-body"><div class="habit-time">07:03</div><div class="habit-name">Supplements — Tabletten nüchtern einnehmen</div></div>
+          <span class="habit-tag tag-body">Body</span>
+        </div>
+        <div class="habit-expand">
+          <div class="expand-why">Konsistenz ist alles. Tabletten direkt mit dem Morgenwasser nehmen — so vergisst du sie nie. Routine schlägt Motivation immer.</div>
+          <div class="expand-tip">Pillbox sichtbar neben dem Glas platzieren. Nie „später" denken — das wird vergessen.</div>
+        </div>
+      </div>
+      <div class="habit-card tag-body" data-id="shower" data-start="07:10" data-end="07:20" onclick="handleCardClick(event,this)">
+        <div class="habit-main">
+          <div class="check-ring"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="habit-body"><div class="habit-time">07:10</div><div class="habit-name">Cold Shower — Letzte 3–5 Min kalt</div></div>
+          <span class="habit-tag tag-body">Body</span>
+        </div>
+        <div class="habit-expand">
+          <div class="expand-why">Kaltwasser erhöht Dopamin nachweislich um bis zu 250% — kein Koffein kommt da ran. Außerdem: pure Willpower-Übung. Wer das morgens schafft, schafft alles.</div>
+          <div class="expand-tip">Warm anfangen, letzten 3 Minuten kalt. Langsam ausatmen, nicht die Luft anhalten.</div>
+        </div>
+      </div>
+      <div class="habit-card tag-look" data-id="skin" data-start="07:20" data-end="07:30" onclick="handleCardClick(event,this)">
+        <div class="habit-main">
+          <div class="check-ring"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="habit-body"><div class="habit-time">07:20</div><div class="habit-name">Looksmaxxing — Cleanser → Moisturizer → SPF</div></div>
+          <span class="habit-tag tag-look">Look</span>
+        </div>
+        <div class="habit-expand">
+          <div class="expand-why">Gesundheit und Erscheinungsbild sind Selbstrespekt. Morgen-Skincare macht über Monate einen echten Unterschied in deiner Haut.</div>
+          <div class="expand-tip">Cleanser → Moisturizer → SPF 50. Täglich ohne Ausnahme. Kein SPF = Lichtschäden auch bei Bewölkung.</div>
+        </div>
+      </div>
+      <div class="habit-card tag-look" data-id="dress" data-start="07:30" data-end="07:35" onclick="handleCardClick(event,this)">
+        <div class="habit-main">
+          <div class="check-ring"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="habit-body"><div class="habit-time">07:30</div><div class="habit-name">Anziehen — Bewusst, kein Random-Outfit</div></div>
+          <span class="habit-tag tag-look">Look</span>
+        </div>
+        <div class="habit-expand">
+          <div class="expand-why">Wie du dich anziehst beeinflusst dein Selbstbild direkt (Enclothed Cognition). Wer gut angezogen ist, verhält sich kompetenter und selbstbewusster.</div>
+          <div class="expand-tip">Outfit abends rauslegen. Morgens keine mentale Energie für solche Entscheidungen verschwenden.</div>
+        </div>
+      </div>
+      <div class="habit-card tag-mind" data-id="bed" data-start="07:35" data-end="07:45" onclick="handleCardClick(event,this)">
+        <div class="habit-main">
+          <div class="check-ring"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="habit-body"><div class="habit-time">07:35</div><div class="habit-name">Space Reset — Bett machen & Zimmer aufräumen</div></div>
+          <span class="habit-tag tag-mind">Mindset</span>
+        </div>
+        <div class="habit-expand">
+          <div class="expand-why">Erste kleine Leistung des Tages — gibt Momentum für alles danach. Unordnung im Zimmer erzeugt nachweislich Hintergrundstress im Gehirn.</div>
+          <div class="expand-tip">5 Minuten: Bett machen → Klamotten weg → Schreibtisch frei. Das wars. Fertig.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="routine-group">
+      <div class="group-label">☕ Aktivierung — 07:45</div>
+      <div class="habit-card tag-mind" data-id="tea" data-start="07:45" data-end="07:55" onclick="handleCardClick(event,this)">
+        <div class="habit-main">
+          <div class="check-ring"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="habit-body"><div class="habit-time">07:45</div><div class="habit-name">Kamillentee — In Ruhe trinken, keine Screens</div></div>
+          <span class="habit-tag tag-mind">Mindset</span>
+        </div>
+        <div class="habit-expand">
+          <div class="expand-why">Kamille hat anxiolytische (angstlösende) Wirkung und ist entzündungshemmend. Als Ritual sagt es deinem Nervensystem: „Ich bin sicher, ich kann klar denken."</div>
+          <div class="expand-tip">Keine Screens beim Tee. 10 Minuten einfach sitzen, trinken, ankommen. Das ist aktive Meditation.</div>
+        </div>
+      </div>
+      <div class="habit-card tag-mind" data-id="podcast" data-start="07:50" data-end="08:15" onclick="handleCardClick(event,this)">
+        <div class="habit-main">
+          <div class="check-ring"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="habit-body"><div class="habit-time">07:50</div><div class="habit-name">Input Block — Podcast oder Hörbuch 20–30 Min</div></div>
+          <span class="habit-tag tag-mind">Mindset</span>
+        </div>
+        <div class="habit-expand">
+          <div class="expand-why">Input vor Output. Während andere morgens Bullshit konsumieren, tankst du Wissen. 20 Min täglich = über 120 Stunden wertvollen Input pro Jahr.</div>
+          <div class="expand-tip">Themen: Business, Gesundheit, Psychologie, Sport, Biographien. Keine Nachrichtenpodcasts morgens — das ist Stressbeschleunigung.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="routine-group">
+      <div class="group-label">🚴 Movement & Create — 08:30</div>
+      <div class="habit-card tag-move" data-id="bike" data-start="08:30" data-end="09:30" onclick="handleCardClick(event,this)">
+        <div class="habit-main">
+          <div class="check-ring"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="habit-body"><div class="habit-time">08:30</div><div class="habit-name">Morning Cardio — Rennrad 45–90 Min mit Rucksack</div></div>
+          <span class="habit-tag tag-move">Move</span>
+        </div>
+        <div class="habit-expand">
+          <div class="expand-why">Zone-2 Ausdauertraining ist die wichtigste Langzeit-Investition in deine Gesundheit. Rennrad mit Rucksack = Cardio + Flexibilität + Freiheit in einem.</div>
+          <div class="expand-tip">Kombiniere es mit deiner Drohne: Fahre zu einer Location, filme dort. Zwei Habits, ein Trip.</div>
+        </div>
+      </div>
+      <div class="habit-card tag-move" data-id="walk" data-start="08:30" data-end="09:00" onclick="handleCardClick(event,this)">
+        <div class="habit-main">
+          <div class="check-ring"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="habit-body"><div class="habit-time">Alt: 08:30</div><div class="habit-name">Morgenspaziergang — 30 Min Sonne & Gedanken</div></div>
+          <span class="habit-tag tag-move">Move</span>
+        </div>
+        <div class="habit-expand">
+          <div class="expand-why">Morgensonne reguliert deinen Cortisol-Peak und setzt die innere Uhr zurück. 10 Min Tageslicht morgens = besserer Schlaf abends, mehr Energie tagsüber.</div>
+          <div class="expand-tip">An Rad-freien Tagen. Ohne Kopfhörer — lass die Gedanken kommen und gehen. Das ist echte Erholung.</div>
+        </div>
+      </div>
+      <div class="habit-card tag-create" data-id="drone" data-start="09:30" data-end="10:30" onclick="handleCardClick(event,this)">
+        <div class="habit-main">
+          <div class="check-ring"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="habit-body"><div class="habit-time">09:30</div><div class="habit-name">Content Block — Drohne & Kamera, Footage drehen</div></div>
+          <span class="habit-tag tag-create">Create</span>
+        </div>
+        <div class="habit-expand">
+          <div class="expand-why">Content Creation ist eine Fähigkeit die sich kompoundiert. Jedes Video macht dich besser. Wer mit 18 anfängt, hat mit 20 einen Vorsprung den andere nicht aufholen können.</div>
+          <div class="expand-tip">Plane eine konkrete Location pro Ausfahrt. Spontan filmen ist gut — geplant filmen ist besser.</div>
+        </div>
+      </div>
+      <div class="habit-card tag-create" data-id="editvid" data-start="10:45" data-end="11:30" onclick="handleCardClick(event,this)">
+        <div class="habit-main">
+          <div class="check-ring"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="habit-body"><div class="habit-time">10:45</div><div class="habit-name">Deep Work — Footage schneiden, posten, lernen</div></div>
+          <span class="habit-tag tag-create">Create</span>
+        </div>
+        <div class="habit-expand">
+          <div class="expand-why">Drehen ohne posten ist ein Hobby. Konsistenz beim Posten baut Reichweite auf — nicht Perfektion. 1 Raw-Clip täglich bearbeitet = 365 Posts im Jahr.</div>
+          <div class="expand-tip">Perfekt ist der Feind von fertig. Poste es. Lerne aus dem Feedback. Wiederhole.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="routine-group">
+      <div class="group-label">🥩 Fuel Station — 11:30</div>
+      <div class="habit-card tag-fuel" data-id="shake" data-start="11:30" data-end="11:35" onclick="handleCardClick(event,this)">
+        <div class="habit-main">
+          <div class="check-ring"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="habit-body"><div class="habit-time">11:30</div><div class="habit-name">Protein Shake — 30–40g Protein direkt nach Cardio</div></div>
+          <span class="habit-tag tag-fuel">Fuel</span>
+        </div>
+        <div class="habit-expand">
+          <div class="expand-why">Protein nach dem Training beschleunigt Regeneration und Muskelaufbau. Ziel: mindestens 2g Protein pro kg Körpergewicht täglich. Der Shake ist das einfachste Fundament.</div>
+          <div class="expand-tip">Mit Wasser oder Milch. Auf nüchternem Magen nach Cardio ist Milch besser für den Insulinspiegel.</div>
+        </div>
+      </div>
+      <div class="habit-card tag-fuel" data-id="meal1" data-start="12:00" data-end="12:30" onclick="handleCardClick(event,this)">
+        <div class="habit-main">
+          <div class="check-ring"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="habit-body"><div class="habit-time">12:00</div><div class="habit-name">Mahlzeit 1 — Echtes Essen, kein Junk</div></div>
+          <span class="habit-tag tag-fuel">Fuel</span>
+        </div>
+        <div class="habit-expand">
+          <div class="expand-why">Echte Nahrung (Fleisch, Eier, Gemüse, Kartoffeln, Reis) liefert Mikronährstoffe die kein Shake ersetzen kann. Erste Mahlzeit = kein Ultra-Processed-Food.</div>
+          <div class="expand-tip">Meal Prep 2x pro Woche. Eier + Gemüse + Protein ist in 10 Minuten fertig. Kein Aufwand, großer Impact.</div>
+        </div>
+      </div>
+      <div class="habit-card tag-body" data-id="water2" data-start="08:00" data-end="20:00" onclick="handleCardClick(event,this)">
+        <div class="habit-main">
+          <div class="check-ring"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="habit-body"><div class="habit-time">Ganztags</div><div class="habit-name">Hydration — 2–3 Liter Wasser gesamt</div></div>
+          <span class="habit-tag tag-body">Body</span>
+        </div>
+        <div class="habit-expand">
+          <div class="expand-why">Schon 2% Dehydrierung senkt kognitive Leistung spürbar. Wasser ist der günstigste und einfachste Performance-Booster überhaupt.</div>
+          <div class="expand-tip">1L Flasche sichtbar hinstellen. Ziel: 3 Flaschen bis Abend. Heller Urin = gut hydriert.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="routine-group">
+      <div class="group-label">🏋️ Iron Therapy — 14:00</div>
+      <div class="habit-card tag-move" data-id="gym" data-start="14:00" data-end="15:30" onclick="handleCardClick(event,this)">
+        <div class="habit-main">
+          <div class="check-ring"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="habit-body"><div class="habit-time">14:00</div><div class="habit-name">Gym Session — Krafttraining 60–90 Min</div></div>
+          <span class="habit-tag tag-move">Move</span>
+        </div>
+        <div class="habit-expand">
+          <div class="expand-why">Muskelmasse ist die beste Investition in Langlebigkeit. Testosteron, Stoffwechsel, Selbstbewusstsein, Knochengesundheit — alles hängt daran. Mit 18 ist das Fundament legen entscheidend.</div>
+          <div class="expand-tip">Push/Pull/Legs oder Upper/Lower. Progressive Überlastung: Jede Woche leicht mehr als letzte Woche — das ist das einzige Prinzip das zählt.</div>
+        </div>
+      </div>
+      <div class="habit-card tag-fuel" data-id="meal2" data-start="15:45" data-end="16:15" onclick="handleCardClick(event,this)">
+        <div class="habit-main">
+          <div class="check-ring"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="habit-body"><div class="habit-time">15:45</div><div class="habit-name">Post-Workout Fuel — Proteinreich & satt</div></div>
+          <span class="habit-tag tag-fuel">Fuel</span>
+        </div>
+        <div class="habit-expand">
+          <div class="expand-why">Nach hartem Training braucht dein Körper Makronährstoffe für Regeneration und Wachstum. Das ist keine Belohnung — das ist Pflicht.</div>
+          <div class="expand-tip">Reis/Kartoffeln + Fleisch/Fisch + Gemüse. Simple, günstig, effektiv. Kein Fast Food als Post-Workout.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="routine-group">
+      <div class="group-label">🌙 Evening Wind-Down — 18:00</div>
+      <div class="habit-card tag-social" data-id="social" data-start="18:00" data-end="20:00" onclick="handleCardClick(event,this)">
+        <div class="habit-main">
+          <div class="check-ring"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="habit-body"><div class="habit-time">18:00</div><div class="habit-name">Social Block — Freunde treffen oder aktiv schreiben</div></div>
+          <span class="habit-tag tag-social">Sozial</span>
+        </div>
+        <div class="habit-expand">
+          <div class="expand-why">Soziale Verbindung ist genauso wichtig wie Schlafen und Trainieren. Isolation ist einer der stärksten Stressfaktoren. Echte Zeit mit Menschen gibt Energie zurück.</div>
+          <div class="expand-tip">Nicht passiv warten. Aktiv vorschlagen: „Treffen wir uns?" Jeden Tag mindestens eine echte Verbindung pflegen.</div>
+        </div>
+      </div>
+      <div class="habit-card tag-mind" data-id="noscreens" data-start="21:30" data-end="22:00" onclick="handleCardClick(event,this)">
+        <div class="habit-main">
+          <div class="check-ring"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="habit-body"><div class="habit-time">21:30</div><div class="habit-name">Digital Sunset — Kein Handy mehr, Wind-Down</div></div>
+          <span class="habit-tag tag-mind">Mindset</span>
+        </div>
+        <div class="habit-expand">
+          <div class="expand-why">Blaues Licht und Dopamin-Loops von Social Media sabotieren deine Melatonin-Produktion. Schlechter Schlaf = schlechteres Training, schlechtere Laune, schlechtere Entscheidungen.</div>
+          <div class="expand-tip">Handy 21:30 in Flugmodus. Buch lesen, stretchen oder Stille. Dein Nervensystem wird dir danken.</div>
+        </div>
+      </div>
+      <div class="habit-card tag-body" data-id="sleep" data-start="22:30" data-end="23:00" onclick="handleCardClick(event,this)">
+        <div class="habit-main">
+          <div class="check-ring"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="habit-body"><div class="habit-time">22:30</div><div class="habit-name">Schlafenszeit — 8 Stunden, non-verhandelbar</div></div>
+          <span class="habit-tag tag-body">Body</span>
+        </div>
+        <div class="habit-expand">
+          <div class="expand-why">Schlaf ist der mächtigste Performance-Enhancer der Welt — und kostenlos. Muskelaufbau, Gedächtnis, Immunsystem, Hormonbalance — alles passiert im Schlaf.</div>
+          <div class="expand-tip">Kühles dunkles Zimmer. Immer gleiche Uhrzeit. 7 Stunden Minimum, 8 ist das Ziel. Non-verhandelbar.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:40px;"></div>
+  </div>
+  <!-- MENTOR -->
+  <div class="section" id="mentor">
+    <div class="mentor-section">
+      <div class="mentor-header">
+        <div class="mentor-avatar">⚡</div>
+        <div>
+          <div class="mentor-name">COACH MAX</div>
+          <div class="mentor-role">Dein persönlicher Mentor • Immer da</div>
+        </div>
+      </div>
+      <div class="chat-window">
+        <div class="chat-messages" id="chatMessages">
+          <div class="msg msg-mentor">
+            <div class="msg-label">COACH MAX</div>
+            <div class="msg-bubble">Hey Arved! Ich bin dein Mentor. 18 Jahre — bester Zeitpunkt überhaupt um solche Habits aufzubauen. Was willst du angehen?</div>
+          </div>
+          <div class="msg msg-mentor">
+            <div class="msg-label">COACH MAX</div>
+            <div class="msg-bubble">Frag mich alles: Training, Ernährung, Content, Motivation, Schlaf, Struktur — ich bin hier.</div>
+          </div>
+        </div>
+        <div class="typing-indicator" id="typingIndicator">
+          <div class="typing-bubble">
+            <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+          </div>
+        </div>
+        <div class="chat-input-row">
+          <input class="chat-input" id="chatInput" type="text" placeholder="Frag Coach Max..." onkeydown="if(event.key==='Enter')sendMessage()">
+          <button class="send-btn" onclick="sendMessage()">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M14 8L2 2L5.5 8L2 14L14 8Z" fill="#000"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="section" id="stats">
+    <div class="stats-section">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-val" id="statStreak">0</div><div class="stat-unit">TAGE</div><div class="stat-label">Streak</div></div>
+        <div class="stat-card"><div class="stat-val" id="statDone">0</div><div class="stat-unit">HEUTE</div><div class="stat-label">Habits erledigt</div></div>
+        <div class="stat-card"><div class="stat-val" id="statTotal">0</div><div class="stat-unit">AKTIV</div><div class="stat-label">Habits gesamt</div></div>
+        <div class="stat-card"><div class="stat-val" id="statPct">0</div><div class="stat-unit">%</div><div class="stat-label">Heute erfüllt</div></div>
+      </div>
+      <div class="week-grid">
+        <div class="week-label">Diese Woche</div>
+        <div class="week-days" id="weekDays"></div>
+      </div>
+      <div class="week-grid">
+        <div class="week-label">Kategorien heute</div>
+        <div class="cat-bar-wrap" id="categoryStats"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT -->
+  <div class="section" id="edit">
+    <div class="edit-section">
+      <div class="edit-note">Aktiviere oder deaktiviere Habits. Alles wird automatisch gespeichert. Tippe auf eine Habit-Karte um mehr zu erfahren.</div>
+      <div id="editList"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="bot-btn active" id="bn-today" onclick="switchTab('today')">
+    <div class="bot-icon">☀️</div><div class="bot-label">Heute</div>
+  </div>
+  <div class="bot-btn" id="bn-mentor" onclick="switchTab('mentor')">
+    <div class="bot-icon">⚡</div><div class="bot-label">Mentor</div>
+  </div>
+  <div class="bot-btn" id="bn-stats" onclick="switchTab('stats')">
+    <div class="bot-icon">📊</div><div class="bot-label">Stats</div>
+  </div>
+  <div class="bot-btn" id="bn-edit" onclick="switchTab('edit')">
+    <div class="bot-icon">✏️</div><div class="bot-label">Anpassen</div>
+  </div>
+</div>
+
+<div class="add-bar">
+  <input type="text" class="add-input" id="newHabit" placeholder="Neue Gewohnheit..." maxlength="60">
+  <button class="btn-add" onclick="addCustomHabit()">+</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ──
+const ALL_HABITS = [
+  {id:'wake',    name:'Aufstehen — Kein Snooze',          tag:'mind',   time:'07:00', start:'07:00', end:'07:05'},
+  {id:'water',   name:'Hydration — 500ml Wasser',         tag:'body',   time:'07:01', start:'07:01', end:'07:05'},
+  {id:'supps',   name:'Supplements — Tabletten',          tag:'body',   time:'07:03', start:'07:03', end:'07:08'},
+  {id:'shower',  name:'Cold Shower — 3-5 Min kalt',      tag:'body',   time:'07:10', start:'07:10', end:'07:20'},
+  {id:'skin',    name:'Looksmaxxing — Skincare',          tag:'look',   time:'07:20', start:'07:20', end:'07:30'},
+  {id:'dress',   name:'Anziehen — Bewusst',               tag:'look',   time:'07:30', start:'07:30', end:'07:35'},
+  {id:'bed',     name:'Space Reset — Bett & Zimmer',     tag:'mind',   time:'07:35', start:'07:35', end:'07:45'},
+  {id:'tea',     name:'Kamillentee — In Ruhe trinken',   tag:'mind',   time:'07:45', start:'07:45', end:'07:55'},
+  {id:'podcast', name:'Input Block — Podcast/Hörbuch',    tag:'mind',   time:'07:50', start:'07:50', end:'08:15'},
+  {id:'bike',    name:'Morning Cardio — Rennrad',        tag:'move',   time:'08:30', start:'08:30', end:'09:30'},
+  {id:'walk',    name:'Morgenspaziergang — 30 Min',      tag:'move',   time:'Alt',   start:'08:30', end:'09:00'},
+  {id:'drone',   name:'Content Block — Drohne/Kamera',   tag:'create', time:'09:30', start:'09:30', end:'10:30'},
+  {id:'editvid', name:'Deep Work — Schneiden & Posten',  tag:'create', time:'10:45', start:'10:45', end:'11:30'},
+  {id:'shake',   name:'Protein Shake — 30-40g',          tag:'fuel',   time:'11:30', start:'11:30', end:'11:35'},
+  {id:'meal1',   name:'Mahlzeit 1 — Echtes Essen',       tag:'fuel',   time:'12:00', start:'12:00', end:'12:30'},
+  {id:'water2',  name:'Hydration — 2-3L Wasser',         tag:'body',   time:'Tag',   start:'08:00', end:'20:00'},
+  {id:'gym',     name:'Gym Session — Krafttraining',     tag:'move',   time:'14:00', start:'14:00', end:'15:30'},
+  {id:'meal2',   name:'Post-Workout Fuel — Protein',     tag:'fuel',   time:'15:45', start:'15:45', end:'16:15'},
+  {id:'social',  name:'Social Block — Freunde',          tag:'social', time:'18:00', start:'18:00', end:'20:00'},
+  {id:'noscreens',name:'Digital Sunset — Kein Handy',    tag:'mind',   time:'21:30', start:'21:30', end:'22:00'},
+  {id:'sleep',   name:'Schlafenszeit — 8 Stunden',       tag:'body',   time:'22:30', start:'22:30', end:'23:00'},
+];
+
+const CAT_COLORS = {
+  mind:'#e8d5b5', body:'#7dd3c0', look:'#f5a8a8',
+  move:'#a5b4fc', fuel:'#fcd34d', create:'#c4b5fd', social:'#fca5a5'
+};
+
+const STORAGE_KEY = 'arved_super_v1';
+
+// ── STATE ──
+let state = {};
+try {
+  state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+} catch(e) { state = {}; }
+if (!state.enabled) state.enabled = {};
+ALL_HABITS.forEach(h => { if (state.enabled[h.id] === undefined) state.enabled[h.id] = true; });
+if (!state.days) state.days = {};
+if (!state.customHabits) state.customHabits = [];
+
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function todayKey() { const d=new Date(); return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; }
+function todayData() { if (!state.days[todayKey()]) state.days[todayKey()]={}; return state.days[todayKey()]; }
+function enabledHabits() { return ALL_HABITS.filter(h=>state.enabled[h.id]).concat(state.customHabits.filter(h=>state.enabled[h.id])); }
+function doneToday() { const t=todayData(); return enabledHabits().filter(h=>t[h.id]); }
+
+// ── TIME UTILS ──
+function parseTime(str) {
+  if (!str || str === 'Flex' || str === 'Alt' || str === 'Post' || str === 'Tag') return null;
+  const [h, m] = str.split(':').map(Number);
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m);
+}
+function isCurrent(habit) {
+  const s = parseTime(habit.start), e = parseTime(habit.end);
+  if (!s || !e) return false;
+  const now = new Date();
+  return now >= s && now <= e;
+}
+function isPast(habit) {
+  const e = parseTime(habit.end);
+  if (!e) return false;
+  return new Date() > e;
+}
+function isUpcoming(habit) {
+  const s = parseTime(habit.start);
+  if (!s) return false;
+  return new Date() < s;
+}
+function getNextHabit() {
+  const en = enabledHabits();
+  const incomplete = en.filter(h => !todayData()[h.id]);
+  const current = incomplete.find(h => isCurrent(h));
+  if (current) return { ...current, status: 'active' };
+  const upcoming = incomplete.filter(h => isUpcoming(h));
+  if (upcoming.length) {
+    upcoming.sort((a,b) => parseTime(a.start) - parseTime(b.start));
+    return { ...upcoming[0], status: 'next' };
+  }
+  const overdue = incomplete.filter(h => isPast(h));
+  if (overdue.length) {
+    overdue.sort((a,b) => parseTime(a.start) - parseTime(b.start));
+    return { ...overdue[0], status: 'overdue' };
+  }
+  return null;
+}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', ()=>{
+  updateDate();
+  restoreChecks();
+  updateProgress();
+  renderEditList();
+  renderWeek();
+  renderCatStats();
+  updateStreakDisplay();
+  renderFocus();
+  highlightCurrent();
+  setInterval(()=>{ highlightCurrent(); renderFocus(); }, 60000);
+});
+
+function updateDate() {
+  const days=['So','Mo','Di','Mi','Do','Fr','Sa'], months=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+  const d=new Date();
+  document.getElementById('dateStr').textContent=`${days[d.getDay()]}, ${d.getDate()}. ${months[d.getMonth()]}`;
+}
+
+function restoreChecks() {
+  const t=todayData();
+  document.querySelectorAll('.habit-card').forEach(c=>{
+    if(t[c.dataset.id]) c.classList.add('done');
+  });
+}
+
+function highlightCurrent() {
+  document.querySelectorAll('.habit-card').forEach(c => {
+    const id = c.dataset.id;
+    const h = ALL_HABITS.find(x => x.id === id);
+    if (!h) return;
+    c.classList.toggle('current', isCurrent(h) && !c.classList.contains('done'));
+  });
+}
+
+function renderFocus() {
+  const next = getNextHabit();
+  const wrap = document.getElementById('focusWrap');
+  if (!next) {
+    wrap.innerHTML = `
+      <div class="focus-card" style="border-color: rgba(200,245,90,0.2);">
+        <div class="focus-label" style="color:var(--accent);">✅ Alles erledigt</div>
+        <div class="focus-title">Tag abgeschlossen</div>
+        <div class="focus-meta">Du hast alle Habits für heute geschafft. Zeit zu recovern.</div>
+      </div>`;
+    return;
+  }
+  const colors = { active: ['var(--accent)','Jetzt dran'], next: ['var(--accent)','Als Nächstes'], overdue: ['#f87171','Überfällig'] };
+  const [color, label] = colors[next.status];
+  wrap.innerHTML = `
+    <div class="focus-card ${next.status==='active'?'active-now':''}" style="${next.status==='overdue'?'border-color:rgba(248,113,113,0.3);':''}">
+      <div class="focus-label" style="color:${color};">
+        ${next.status==='active'?'<span class="dot"></span>':''} ${label}
+      </div>
+      <div class="focus-title">${escapeHtml(next.name)}</div>
+      <div class="focus-meta">
+        <span>⏱ ${next.time}</span>
+        <span>🕐 ${next.start} – ${next.end}</span>
+        <span>🏷 ${next.tag}</span>
+      </div>
+      <div class="focus-action">
+        <button class="btn" onclick="toggleById('${next.id}')">✓ Erledigt</button>
+        <button class="btn btn-ghost" onclick="scrollToId('${next.id}')">Details</button>
+      </div>
+    </div>`;
+}
+
+function toggleById(id) {
+  const card = document.querySelector(`.habit-card[data-id="${id}"]`);
+  if (card) handleCardClick({ target: card.querySelector('.check-ring') }, card);
+}
+
+function scrollToId(id) {
+  const card = document.querySelector(`.habit-card[data-id="${id}"]`);
+  if (card) {
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    card.style.transform = 'scale(1.02)';
+    setTimeout(() => card.style.transform = '', 400);
+  }
+}
+
+// ── TAB SWITCH ──
+const tabMap={today:0,mentor:1,stats:2,edit:3};
+function switchTab(id) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.bot-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const navTabs=document.querySelectorAll('.nav-tab');
+  if(tabMap[id]!==undefined) navTabs[tabMap[id]].classList.add('active');
+  const bnEl=document.getElementById('bn-'+id);
+  if(bnEl) bnEl.classList.add('active');
+  if(id==='stats'){ renderWeek(); renderCatStats(); renderStatsCards(); }
+}
+
+// ── HABIT CLICK ──
+function handleCardClick(e, card) {
+  const checkRing = card.querySelector('.check-ring');
+  const clickedCheck = checkRing && checkRing.contains(e.target);
+
+  if (clickedCheck || !card.classList.contains('open')) {
+    if (!card.classList.contains('done')) {
+      card.classList.add('done');
+      card.classList.remove('open');
+      const id = card.dataset.id;
+      todayData()[id] = true;
+      save(); updateProgress(); renderCatStats(); updateStreakDisplay(); renderFocus(); highlightCurrent();
+      checkAllDone();
+      showToast(getMotivation());
+      return;
+    } else if (clickedCheck) {
+      card.classList.remove('done');
+      const id = card.dataset.id;
+      delete todayData()[id];
+      save(); updateProgress(); renderCatStats(); updateStreakDisplay(); renderFocus(); highlightCurrent();
+      return;
+    }
+  }
+  card.classList.toggle('open');
+}
+
+function checkAllDone() {
+  const en=enabledHabits(), dn=doneToday();
+  if(dn.length===en.length && en.length>0) {
+    setTimeout(()=>showToast('🏆 PROTOCOL COMPLETE. Legendär.'),500);
+    celebrate();
+    updateStreak();
+  }
+}
+
+// ── PROGRESS ──
+function updateProgress() {
+  const en=enabledHabits(), dn=doneToday(), total=en.length, pct=total>0?Math.round(dn.length/total*100):0;
+  document.getElementById('scoreValue').textContent=pct+'%';
+  document.getElementById('scoreSub').textContent=`${dn.length} / ${total}`;
+  document.getElementById('streakValue').textContent=getStreak();
+  const ring = document.getElementById('heroRing');
+  const circumference = 2 * Math.PI * 20;
+  const offset = circumference - (pct / 100) * circumference;
+  ring.style.strokeDashoffset = offset;
+}
+
+function updateStreak() {
+  const today = new Date().toDateString();
+  const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+  const lastPerfect = localStorage.getItem('arvedLastPerfect');
+  if (lastPerfect === today) return;
+  let streak = parseInt(localStorage.getItem('arvedStreak') || '0');
+  if (lastPerfect === yesterday.toDateString()) {
+    streak++;
+  } else {
+    streak = 1;
+  }
+  localStorage.setItem('arvedStreak', streak.toString());
+  localStorage.setItem('arvedLastPerfect', today);
+  document.getElementById('streakValue').textContent = streak;
+  document.getElementById('streakCount').textContent = streak;
+}
+
+function getStreak() {
+  return parseInt(localStorage.getItem('arvedStreak') || '0');
+}
+
+// ── STATS ──
+function renderStatsCards() {
+  const en=enabledHabits(), dn=doneToday(), total=en.length, pct=total>0?Math.round(dn.length/total*100):0;
+  document.getElementById('statDone').textContent=dn.length;
+  document.getElementById('statTotal').textContent=total;
+  document.getElementById('statPct').textContent=pct;
+  document.getElementById('statStreak').textContent=getStreak();
+}
+
+function renderCatStats() {
+  const cats={body:'Body',mind:'Mindset',look:'Look',move:'Move',fuel:'Fuel',create:'Create',social:'Sozial'};
+  const t=todayData(), el=document.getElementById('categoryStats');
+  if(!el) return;
+  el.innerHTML='';
+  Object.entries(cats).forEach(([tag,label])=>{
+    const habits=ALL_HABITS.filter(h=>h.tag===tag&&state.enabled[h.id]);
+    if(!habits.length) return;
+    const done=habits.filter(h=>t[h.id]).length;
+    const pct=Math.round(done/habits.length*100);
+    const color = CAT_COLORS[tag];
+    el.innerHTML+=`<div class="cat-bar-row">
+      <div class="cat-bar-label">${label}</div>
+      <div class="cat-bar-track"><div class="cat-bar-fill" style="width:${pct}%;background:${color};"></div></div>
+      <div class="cat-bar-pct">${pct}%</div>
+    </div>`;
+  });
+}
+
+function renderWeek() {
+  const dayLabels=['Mo','Di','Mi','Do','Fr','Sa','So'], el=document.getElementById('weekDays');
+  if(!el) return;
+  el.innerHTML='';
+  const now=new Date(), todayDay=(now.getDay()+6)%7;
+  for(let i=0;i<7;i++){
+    const d=new Date(now); d.setDate(now.getDate()-(todayDay-i));
+    const key=`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    const dayData=state.days[key]||{};
+    const en=ALL_HABITS.filter(h=>state.enabled[h.id]);
+    const done=en.filter(h=>dayData[h.id]).length;
+    const isFuture=i>todayDay, isToday=i===todayDay;
+    const pct=en.length>0?done/en.length:0;
+    let cls='';
+    if(!isFuture){ if(pct>=0.8)cls='great'; else if(pct>=0.5)cls='good'; else if(pct>0)cls='ok'; }
+    if(isToday) cls+=' today';
+    const lbl=isFuture?'·':(done>0?done:'–');
+    el.innerHTML+=`<div class="week-day"><div class="week-day-label">${dayLabels[i]}</div><div class="week-dot ${cls}">${lbl}</div></div>`;
+  }
+}
+
+function updateStreakDisplay() {
+  const s=getStreak();
+  document.getElementById('streakCount').textContent=s;
+  const el=document.getElementById('statStreak');
+  if(el) el.textContent=s;
+}
+
+// ── EDIT ──
+function renderEditList() {
+  const el=document.getElementById('editList');
+  if(!el) return;
+  el.innerHTML='';
+  ALL_HABITS.forEach(h=>{
+    const on=state.enabled[h.id]?'on':'';
+    el.innerHTML+=`<div class="edit-habit-row">
+      <div class="edit-habit-time">${h.time}</div>
+      <div class="edit-habit-name">${h.name}</div>
+      <div class="toggle-btn ${on}" onclick="toggleEnabled('${h.id}',this)"></div>
+    </div>`;
+  });
+}
+function toggleEnabled(id,btn) {
+  state.enabled[id]=!state.enabled[id];
+  btn.classList.toggle('on',state.enabled[id]);
+  save(); updateProgress(); renderCatStats();
+}
+
+// ── ADD CUSTOM HABIT ──
+function addCustomHabit() {
+  const input = document.getElementById('newHabit');
+  const text = input.value.trim();
+  if (!text) return;
+  const id = 'c' + Date.now();
+  const habit = {
+    id, name: text, tag: 'mind', time: 'Flex',
+    start: new Date().getHours() + ':' + String(new Date().getMinutes()).padStart(2,'0'),
+    end: (new Date().getHours() + 1) + ':' + String(new Date().getMinutes()).padStart(2,'0')
+  };
+  state.customHabits.push(habit);
+  state.enabled[id] = true;
+  input.value = '';
+  save(); updateProgress(); renderCatStats();
+  showToast('✨ Habit hinzugefügt');
+}
+
+// ── CELEBRATION ──
+function celebrate() {
+  const cel = document.getElementById('celebration');
+  cel.classList.add('show');
+  spawnConfetti();
+  setTimeout(() => cel.classList.remove('show'), 3000);
+}
+function spawnConfetti() {
+  for (let i = 0; i < 30; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.top = '-10px';
+    c.style.background = ['#c8f55a', '#f5c84a', '#7dd3c0', '#a5b4fc'][Math.floor(Math.random() * 4)];
+    c.style.width = Math.random() * 8 + 4 + 'px';
+    c.style.height = c.style.width;
+    document.body.appendChild(c);
+    const duration = Math.random() * 2 + 1.5;
+    c.animate([
+      { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+      { transform: `translateY(${window.innerHeight}px) rotate(${Math.random()*720}deg)`, opacity: 0 }
+    ], { duration: duration * 1000, easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)' });
+    setTimeout(() => c.remove(), duration * 1000);
+  }
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+const MOTIVATIONS=[
+  '✅ Erledigt. Weiter so.','🔥 Habit abgehakt!','💪 So wird ein Champion gebaut.',
+  '⚡ Du bist auf dem richtigen Weg.','✨ Jeden Tag ein bisschen besser.',
+  '🎯 Konsistenz schlägt Motivation.','🚀 Arved im Aufbau-Modus.',
+  '💎 Kleine Schritte, große Wirkung.'
+];
+function getMotivation() { return MOTIVATIONS[Math.floor(Math.random()*MOTIVATIONS.length)]; }
+
+// ── MENTOR CHAT ──
+const SYSTEM = `Du bist Coach Max, der persönliche Mentor von Arved (18 Jahre alt, männlich). Arved baut gerade Struktur in sein Leben ein: 07:00 aufstehen, Kaltwasserdusche, Skincare, Rennrad, Gym, Content Creation mit Drohne, gesunde Ernährung, soziale Kontakte, früh schlafen.
+
+Dein Stil:
+- Direkt, ehrlich, motivierend — wie ein erfahrener älterer Bruder
+- Kennst Arved beim Namen, nutzt ihn gelegentlich
+- Kurze klare Antworten (2–4 Sätze), außer er fragt nach Details
+- Keine leere Motivation, sondern konkrete Tipps mit wissenschaftlichem Hintergrund
+- Du sagst auch unbequeme Wahrheiten
+- Immer auf Deutsch
+- Emojis sehr sparsam
+- Kein Bullshit, kein Herumreden`;
+
+let chatHistory = [];
+
+const FALLBACKS = {
+  'motivation': 'Arved, Motivation ist ein Mythos. Was zählt ist Routine. Du hast die Struktur — jetzt musst du nur noch ausführen. Keine Diskussion.',
+  'training': 'Push/Pull/Legs, 3–4x pro Woche. Progressive Überlastung: Mehr Gewicht oder mehr Reps als letzte Woche. Das ist alles was zählt.',
+  'ernährung': '2g Protein pro kg Körpergewicht. Echte Lebensmittel. Kein Junk. Der Shake ist nur ein Supplement, kein Ersatz für echtes Essen.',
+  'schlaf': '8 Stunden, non-verhandelbar. Kein Handy nach 21:30. Dunkel, kühl, ruhig. Ohne Schlaf zerstörst du alle anderen Fortschritte.',
+  'content': 'Drehen ist 20%, Posten ist 80%. Perfektionismus killt Konsistenz. Poste es, lerne, wiederhole. 365 Posts im Jahr = unstoppable.',
+  'default': 'Gute Frage, Arved. Bleib dran, fokussiere dich auf das nächste Habit auf deiner Liste. Konsistenz schlägt alles andere.'
+};
+
+function getFallback(msg) {
+  const lower = msg.toLowerCase();
+  if (lower.includes('motiv') || lower.includes('lust') || lower.includes('kein bock')) return FALLBACKS.motivation;
+  if (lower.includes('train') || lower.includes('gym') || lower.includes('sport')) return FALLBACKS.training;
+  if (lower.includes('essen') || lower.includes('ernähr') || lower.includes('protein') || lower.includes('mahl')) return FALLBACKS.ernährung;
+  if (lower.includes('schlaf') || lower.includes('müde') || lower.includes('insom')) return FALLBACKS.schlaf;
+  if (lower.includes('content') || lower.includes('drohne') || lower.includes('video') || lower.includes('post')) return FALLBACKS.content;
+  return FALLBACKS.default;
+}
+
+async function sendMessage() {
+  const input=document.getElementById('chatInput');
+  const msg=input.value.trim();
+  if(!msg) return;
+  input.value='';
+  addMsg('user',msg);
+  chatHistory.push({role:'user',content:msg});
+
+  const typing=document.getElementById('typingIndicator');
+  const chatEl=document.getElementById('chatMessages');
+  chatEl.appendChild(typing);
+  typing.classList.add('visible');
+  chatEl.scrollTop=chatEl.scrollHeight;
+
+  try {
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYSTEM,messages:chatHistory.slice(-12)})
+    });
+    if (!res.ok) throw new Error('API Error');
+    const data=await res.json();
+    const reply=data.content?.map(b=>b.text||'').join('')||'Bin kurz nicht erreichbar. Mach einfach weiter.';
+    typing.classList.remove('visible');
+    addMsg('mentor',reply);
+    chatHistory.push({role:'assistant',content:reply});
+  } catch(e) {
+    typing.classList.remove('visible');
+    const fallback = getFallback(msg);
+    addMsg('mentor', fallback);
+    chatHistory.push({role:'assistant',content:fallback});
+  }
+  chatEl.scrollTop=chatEl.scrollHeight;
+}
+function addMsg(type,text) {
+  const el=document.getElementById('chatMessages');
+  const isM=type==='mentor';
+  el.insertAdjacentHTML('beforeend',`<div class="msg msg-${isM?'mentor':'user'}">${isM?'<div class="msg-label">COACH MAX</div>':''}<div class="msg-bubble">${escapeHtml(text)}</div></div>`);
+  el.scrollTop=el.scrollHeight;
+}
+
+function escapeHtml(text) {
+  const div=document.createElement('div');
+  div.textContent=text;
+  return div.innerHTML;
+}
+
+document.getElementById('newHabit').addEventListener('keypress', e => {
+  if (e.key === 'Enter') addCustomHabit();
+});
+</script>
+</body>
+</html>
